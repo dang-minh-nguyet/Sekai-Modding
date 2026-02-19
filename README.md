@@ -1,7 +1,7 @@
 # Sekai-FModding
-Tools for modding fonts in Project Sekai (Japanese Server).
+Tools for modding fonts in a certain Miku tap tap game (native: JP Server, might work on EN).
 
-## 1. Preparation (Prerequisites)
+## 1. Preparation
 Ensure you have Python installed. You will need the following libraries:
 
 ```bash
@@ -13,13 +13,12 @@ Place your files in the following structure:
 
 - **fontMerging/**:
   - `merge_fonts.py`: Script to merge Vietnamese/Latin glyphs into Japanese fonts.
-  - Place your source fonts here (e.g., `FOT-RodinNTLG Pro EB.otf`, `#9Slide05 SVNBellico.ttf`).
-
+  - Source font included. Add your own here and modify the script.
 - **script/**:
   - `inject_font.py`: Script to inject the merged font and updated assets into the game's AssetBundle.
-  - Place the original game bundle `common` here (rename it to `common.bak` to keep a backup).
+  - Original file included.
 
-## 3. Execution (How to Run)
+## 3.  How to Run
 
 ### Step A: Merge Fonts
 Combine your custom Latin/Vietnamese font with the game's Japanese font.
@@ -31,14 +30,25 @@ cd fontMerging
 python merge_fonts.py
 ```
 
-This will generate merged font files (e.g., `FOT-RodinNTLG Pro EB - Merged.otf`).
+This will generate merged font files.
 
 ### Step B: Create Replacement Bundle (Unity)
-*(Note: requires Unity Editor with AssetBundle Browser)*
+*(Note: requires Unity Editor with AssetBundle Browser, Unity version 2022.3.31f1, with Android Build Support.)*
 1. Import the **merged** font files into Unity.
-2. Create `TMP_FontAsset` objects for them using TextMeshPro.
-3. Build these into a new AssetBundle named `font_replacement`.
-4. Copy `font_replacement` to the `script/` folder.
+2. Inside Unity Editor, go to Window -> TextMesh Pro -> Font Asset Creator
+3. Config
+- Sampling Point Size, choose Custom then 42
+- Padding 5
+- Atlas Res: 4096 x 2048 (Native)
+- Character Set: Custom or Character from file. Refer to the txt files inside unityMisc for the characters.
+- Render Mode: SFDAA
+4. Generate the Atlas, then Save. Name should be
+- FOT-RodinNTLGPro-EB-OnDemand (In story, EB is the character name)
+- FOT-RodinNTLGPro-DB-OnDemand (In story, DB is the text)
+5. Build the font.
+- Copy BuildAssetBundles.cs into /Assets/Editor
+- In Unity Editor, Assets -> Build Font AssetBundle (Android)
+6. Copy the font_replacement file into the script folder.
 
 ### Step C: Inject into Game Bundle
 Inject the new font assets and textures into the original game bundle.
@@ -50,3 +60,8 @@ python inject_font.py font_replacement
 ```
 
 This will generate a `common` file (encrypted) ready to be used in the game.
+
+### Finalizing and testing
+Rename the common file into 4ad9182d51b21d790af3f73d72ddc193.  
+Navigate to Android/data/com.sega.pjsekai/files/data/47a2 and replace the file inside.  
+Open the game. The font should appear in Rank and Level if done correctly.
