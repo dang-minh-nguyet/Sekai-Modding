@@ -268,13 +268,13 @@ def main():
         merge_pairs = [
             (
                 os.path.join(script_dir, "FOT-RodinNTLG Pro EB.otf"),
-                os.path.join(script_dir, "#9Slide05 SVNBellico.ttf"),
-                os.path.join(script_dir, "FOT-RodinNTLG Pro EB - Merged.otf"),
+                os.path.join(script_dir, "YourFont1.ttf"),
+                os.path.join(script_dir, "FOT-RodinNTLGPro-EB-OnDemand.otf"),
             ),
             (
                 os.path.join(script_dir, "FOT-RodinNTLG Pro DB.otf"),
-                os.path.join(script_dir, "#9Slide03 AMPLESOFT MEDIUM.ttf"),
-                os.path.join(script_dir, "FOT-RodinNTLG Pro DB - Merged.otf"),
+                os.path.join(script_dir, "YourFont2.ttf"),
+                os.path.join(script_dir, "FOT-RodinNTLGPro-DB-OnDemand.otf"),
             ),
         ]
         
