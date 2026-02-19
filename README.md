@@ -37,18 +37,17 @@ This will generate merged font files.
 1. Import the **merged** font files into Unity.
 2. Inside Unity Editor, go to Window -> TextMesh Pro -> Font Asset Creator
 3. Config
-Sampling Point Size, choose Custom then 42
-Padding 5
-Atlas Res: 4096 x 2048 (Native)
-Character Set: Custom or Character from file. Refer to the txt files inside unityMisc for the characters.
-Render Mode: SFDAA
-4. Generate the Atlas, then Save.
-Name should be
-FOT-RodinNTLGPro-EB-OnDemand (In story, EB is the character name)
-FOT-RodinNTLGPro-DB-OnDemand (In story, DB is the text)
+- Sampling Point Size, choose Custom then 42
+- Padding 5
+- Atlas Res: 4096 x 2048 (Native)
+- Character Set: Custom or Character from file. Refer to the txt files inside unityMisc for the characters.
+- Render Mode: SFDAA
+4. Generate the Atlas, then Save. Name should be
+- FOT-RodinNTLGPro-EB-OnDemand (In story, EB is the character name)
+- FOT-RodinNTLGPro-DB-OnDemand (In story, DB is the text)
 5. Build the font.
-Copy BuildAssetBundles.cs into /Assets/Editor
-In Unity Editor, Assets -> Build Font AssetBundle (Android)
+- Copy BuildAssetBundles.cs into /Assets/Editor
+- In Unity Editor, Assets -> Build Font AssetBundle (Android)
 6. Copy the font_replacement file into the script folder.
 
 ### Step C: Inject into Game Bundle
