@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.manifest
+
+# Unity/AssetBundles
+*.unity3d
+*.bundle
+*.assets
+*.bak
+*.decrypted
+*.lz4
+
+# OS
+Thumbs.db
+Desktop.ini
+
+# IDE
+.vscode/
+.idea/
