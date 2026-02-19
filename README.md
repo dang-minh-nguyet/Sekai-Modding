@@ -42,10 +42,11 @@ Padding 5
 Atlas Res: 4096 x 2048 (Native)
 Character Set: Custom or Character from file. Refer to the txt files inside unityMisc for the characters.
 Render Mode: SFDAA
-4. Generate the Atlas, then Save. Name should be
+4. Generate the Atlas, then Save.
+Name should be
 FOT-RodinNTLGPro-EB-OnDemand (In story, EB is the character name)
 FOT-RodinNTLGPro-DB-OnDemand (In story, DB is the text)
-5. Build the font
+5. Build the font.
 Copy BuildAssetBundles.cs into /Assets/Editor
 In Unity Editor, Assets -> Build Font AssetBundle (Android)
 6. Copy the font_replacement file into the script folder.
@@ -62,6 +63,6 @@ python inject_font.py font_replacement
 This will generate a `common` file (encrypted) ready to be used in the game.
 
 ### Finalizing and testing
-Rename the common file into 4ad9182d51b21d790af3f73d72ddc193.
-Navigate to Android/data/com.sega.pjsekai/files/data/47a2 and replace the file inside.
+Rename the common file into 4ad9182d51b21d790af3f73d72ddc193.  
+Navigate to Android/data/com.sega.pjsekai/files/data/47a2 and replace the file inside.  
 Open the game. The font should appear in Rank and Level if done correctly.
