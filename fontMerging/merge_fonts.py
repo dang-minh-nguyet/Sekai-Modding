@@ -2,7 +2,6 @@ import argparse
 import copy
 import logging
 import os
-from fontTools.pens.recordingPen import RecordingPen
 from fontTools.pens.t2CharStringPen import T2CharStringPen
 from fontTools.ttLib import TTFont
 
@@ -67,48 +66,87 @@ def merge_truetype_to_truetype(base_font: TTFont, override_font: TTFont, overrid
 def merge_truetype_to_cff(base_font: TTFont, override_font: TTFont, override_codepoints: set) -> tuple:
     base_cmap, override_cmap = base_font.getBestCmap(), override_font.getBestCmap()
     base_hmtx, override_hmtx = base_font["hmtx"], override_font["hmtx"]
-    base_charstrings = base_font["CFF "].cff.topDictIndex[0].CharStrings
-    private = next(iter(base_charstrings.values())).private
-    global_subrs = getattr(base_font["CFF "].cff, 'GlobalSubrs', [])
+    
+    cff = base_font["CFF "]
+    top_dict = cff.cff.topDictIndex[0]
+    base_charstrings = top_dict.CharStrings
+    
+    # Get CFF private dict and global subrs from an existing charstring
+    sample_cs = base_charstrings[list(base_charstrings.keys())[0]]
+    private = sample_cs.private
+    global_subrs = getattr(cff.cff, 'GlobalSubrs', [])
+    
     glyphset = override_font.getGlyphSet()
     
-    next_cid = max((int(name[3:]) for name in base_charstrings if name.startswith("cid") and name[3:].isdigit()), default=0) + 1
-    replaced = added = skipped = 0
+    # Find the highest CID for allocating new slots
+    max_cid = 0
+    for name in base_charstrings.keys():
+        if name.startswith("cid"):
+            try:
+                max_cid = max(max_cid, int(name[3:]))
+            except ValueError:
+                pass
+    next_cid = max_cid + 1
+    
+    replaced, added, skipped = 0, 0, 0
     
     for cp in sorted(override_codepoints):
-        if not (glyph_name := override_cmap.get(cp)) or glyph_name not in glyphset:
+        glyph_name = override_cmap.get(cp)
+        if not glyph_name or glyph_name not in glyphset:
             skipped += 1
             continue
+        
+        # Convert the TrueType glyph to a CFF T2 CharString.
+        # Pass glyphSet so composite/component glyphs (e.g. Vietnamese accented
+        # characters built from base + combining marks) are decomposed into
+        # their constituent contours rather than failing on addComponent.
         try:
-            pen = RecordingPen()
-            glyphset[glyph_name].draw(pen)
             width = override_hmtx.metrics[glyph_name][0] if glyph_name in override_hmtx.metrics else 0
-            t2pen = T2CharStringPen(width, glyphSet=None)
-            pen.replay(t2pen)
+            t2pen = T2CharStringPen(width, glyphSet=glyphset)
+            glyphset[glyph_name].draw(t2pen)
             charstring = t2pen.getCharString()
-            charstring.private, charstring.globalSubrs = private, global_subrs
+            charstring.private = private
+            charstring.globalSubrs = global_subrs
         except Exception as e:
             logger.warning(f"  Failed to convert glyph U+{cp:04X} ({glyph_name}): {e}")
             skipped += 1
             continue
-            
+        
+        # Conversion succeeded — now commit the glyph
         if cp in base_cmap:
+            # Replace existing glyph
             target_name = base_cmap[cp]
+            base_charstrings[target_name] = charstring
+            if glyph_name in override_hmtx.metrics:
+                base_hmtx.metrics[target_name] = override_hmtx.metrics[glyph_name]
             replaced += 1
         else:
+            # Allocate new CID slot
             target_name = f"cid{next_cid:05d}"
             next_cid += 1
-            base_font.setGlyphOrder(base_font.getGlyphOrder() + [target_name])
+            
+            # Add to glyph order
+            glyph_order = base_font.getGlyphOrder()
+            glyph_order.append(target_name)
+            base_font.setGlyphOrder(glyph_order)
+            
+            # Add to charstrings (register slot, then append data)
             base_charstrings.charStrings[target_name] = len(base_charstrings.charStrings)
             base_charstrings.charStringsIndex.append(charstring)
+            
+            # Add to cmap
             for table in base_font["cmap"].tables:
                 if hasattr(table, "cmap") and isinstance(table.cmap, dict):
                     table.cmap[cp] = target_name
-            added += 1
             
-        base_charstrings[target_name] = charstring
-        base_hmtx.metrics[target_name] = override_hmtx.metrics.get(glyph_name, (width, 0))
-        
+            # Add hmtx entry
+            if glyph_name in override_hmtx.metrics:
+                base_hmtx.metrics[target_name] = override_hmtx.metrics[glyph_name]
+            else:
+                base_hmtx.metrics[target_name] = (width, 0)
+            
+            added += 1
+    
     return replaced, added, skipped
 
 def merge_fonts(base_path: str, override_path: str, output_path: str):

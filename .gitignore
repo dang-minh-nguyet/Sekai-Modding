@@ -12,9 +12,18 @@ __pycache__/
 *.decrypted
 *.lz4
 
+# Font files (large binaries — keep out of repo)
+*.otf
+*.ttf
+
+# Raw game bundle data / output files (no extension or binary output)
+script/font_replacement
+script/4ad9182d51b21d790af3f73d72ddc193
+
 # OS
 Thumbs.db
 Desktop.ini
+.DS_Store
 
 # IDE
 .vscode/
