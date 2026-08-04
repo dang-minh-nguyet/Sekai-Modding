@@ -8,7 +8,6 @@ __pycache__/
 *.unity3d
 *.bundle
 *.assets
-*.bak
 *.decrypted
 *.lz4
 
@@ -19,6 +18,18 @@ __pycache__/
 # Raw game bundle data / output files (no extension or binary output)
 script/font_replacement
 script/4ad9182d51b21d790af3f73d72ddc193
+
+# logoModding — keep only scripts, ignore all binary/image assets
+logoModding/alt.png
+logoModding/alt.webp
+logoModding/alt_preview_*.png
+logoModding/426774ceaca2c93196cdb9e2c551d1ff
+logoModding/decrypt_bundle.py
+logoModding/encrypt_bundle.py
+
+# General output suffixes
+*.modded
+*.encrypted
 
 # OS
 Thumbs.db
