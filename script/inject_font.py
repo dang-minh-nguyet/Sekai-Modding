@@ -47,7 +47,7 @@ def main():
 
     # Load Bundles
     print("Loading Original Bundle...")
-    UnityPy.config.FALLBACK_UNITY_VERSION = "2022.3.31f1" 
+    UnityPy.config.FALLBACK_UNITY_VERSION = "2022.3.62f2" 
     decrypted_data = load_encrypted_bundle(ORIGINAL_BUNDLE_PATH)
     env_old = UnityPy.load(decrypted_data)
     

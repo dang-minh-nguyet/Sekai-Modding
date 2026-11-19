@@ -1,8 +1,9 @@
-# Python
+# Python & uv
 __pycache__/
 *.py[cod]
 *$py.class
 *.manifest
+.venv/
 
 # Unity/AssetBundles
 *.unity3d
@@ -14,10 +15,16 @@ __pycache__/
 # Font files (large binaries — keep out of repo)
 *.otf
 *.ttf
+*.ttc
+*.otc
 
-# Raw game bundle data / output files (no extension or binary output)
+# Raw game bundle data / output files & downloaded tools
+script/common
 script/font_replacement
 script/4ad9182d51b21d790af3f73d72ddc193
+script/tools/
+*.exe
+test_builds/
 
 # logoModding — keep only scripts, ignore all binary/image assets
 logoModding/alt.png

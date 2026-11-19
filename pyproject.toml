@@ -1,0 +1,11 @@
+[project]
+name = "sekai-modding"
+version = "0.2.0"
+description = "Font & logo modding tools for Project Sekai (no Unity Editor required)"
+requires-python = ">=3.10"
+dependencies = [
+    "UnityPy",
+    "fonttools",
+    "numpy",
+    "pillow",
+]
