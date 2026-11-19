@@ -400,16 +400,21 @@ def build_bundle(
     if len(font_objs) != 2:
         raise RuntimeError(f"Expected DB & EB TMP_FontAssets in bundle, found: {list(font_objs.keys())}")
 
-    if charset_path:
-        with open(charset_path, "r", encoding="utf-8") as f:
-            codepoints = sorted(set(ord(ch) for ch in f.read()))
-        logger.info(f"Using custom charset '{charset_path}': {len(codepoints)} unique chars")
+    default_charset = os.path.join(os.path.dirname(os.path.abspath(__file__)), "characters.txt")
+    resolved_charset = charset_path or (default_charset if os.path.isfile(default_charset) else None)
+
+    if resolved_charset:
+        with open(resolved_charset, "r", encoding="utf-8-sig") as f:
+            codepoints = sorted(set(ord(ch) for ch in f.read() if ord(ch) >= 0x20))
+        logger.info(f"Using charset '{resolved_charset}': {len(codepoints)} unique chars")
     else:
         orig_cps = set()
         for fobj in font_objs.values():
             tt = fobj.read_typetree()
             for entry in tt.get("m_CharacterTable", []):
-                orig_cps.add(int(entry["m_Unicode"]))
+                cp = int(entry["m_Unicode"])
+                if cp >= 0x20:
+                    orig_cps.add(cp)
         orig_cps.update(ord(ch) for ch in EXTRA_DEFAULT_CHARS)
         codepoints = sorted(orig_cps)
         logger.info(
@@ -528,7 +533,7 @@ def main():
     parser.add_argument(
         "--charset",
         default=None,
-        help="Optional UTF-8 text file of characters (default: common.bak charset + ASCII & Vietnamese)",
+        help="Optional UTF-8 text file of characters (default: script/characters.txt if present, else common.bak + ASCII & Vietnamese)",
     )
     parser.add_argument("--msdf-bin", default=None, help="Optional path to msdf-atlas-gen executable")
     parser.add_argument("--point-size", type=int, default=42, help="Sampling point size (default: 42)")

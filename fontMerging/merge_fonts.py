@@ -590,7 +590,7 @@ def check_coverage(font: TTFont, override_cmap: Dict[int, str]) -> Tuple[int, in
         logger.warning(
             f"Override font is missing {len(missing_viet)}/{len(VIETNAMESE_CHARS)} Vietnamese char(s): {sample}"
         )
-    else:
+    elif not missing_ascii:
         logger.info(
             f"Coverage OK: all {len(ASCII_PRINTABLE)} ASCII + all {len(VIETNAMESE_CHARS)} Vietnamese chars present."
         )
@@ -644,6 +644,7 @@ def verify_merged_font(path: str) -> None:
         # Spot-draw sample glyphs across ASCII, Vietnamese, and Japanese to confirm CharStrings & widths match hmtx
         gs = font.getGlyphSet()
         cmap = font.getBestCmap() or {}
+        combining_pairs = {"_": 0x0332, "~": 0x0303, "`": 0x0300}
         for ch in "Aa0 _~`ĐđƠơƯưẠạẤấỆệỘộỨứỲỳあ亜":
             g = cmap.get(ord(ch))
             if not g:
@@ -651,10 +652,15 @@ def verify_merged_font(path: str) -> None:
             bp = BoundsPen(gs)
             gs[g].draw(bp)
             hmtx_w = font["hmtx"].metrics[g][0]
-            if ch in "_~`":
-                assert hmtx_w > 0, (
-                    f"Printable ASCII {ch!r} ({g}) has zero advance width — possible combining mark collision!"
+            if ch in combining_pairs:
+                comb_g = cmap.get(combining_pairs[ch])
+                assert comb_g != g, (
+                    f"Printable ASCII {ch!r} ({g}) shares glyph with combining mark U+{combining_pairs[ch]:04X}!"
                 )
+                if hmtx_w == 0:
+                    logger.warning(
+                        f"Printable ASCII {ch!r} ({g}) has zero advance width in override font."
+                    )
             if "CFF " in font:
                 cs = font["CFF "].cff.topDictIndex[0].CharStrings[g]
                 cs.decompile()
@@ -731,6 +737,9 @@ def merge_fonts(
         else:
             raise ValueError(f"Unsupported base font format: {base_type} (expected cff or truetype)")
 
+        out_dir = os.path.dirname(os.path.abspath(output_path))
+        if out_dir:
+            os.makedirs(out_dir, exist_ok=True)
         base_font.save(output_path)
         logger.info(
             f"Saved '{output_path}' — replaced={replaced}, added={added}, skipped={skipped}"

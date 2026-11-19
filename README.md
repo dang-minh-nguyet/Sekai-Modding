@@ -5,10 +5,9 @@ Bộ script nhỏ để mod font chữ tiếng Việt / tiếng Anh (và logo) c
 
 ---
 
-# Disclaimer
+## Disclaimer
 
 Mọi hành động can thiệp đến file game đều là vi phạm TOS của Sega/Colorful Palette, cân nhắc trước khi sử dụng.
-
 
 ## Hướng dẫn
 
@@ -61,7 +60,7 @@ uv run fontMerging/merge_fonts.py "fontMerging/FOT-RodinNTLG Pro EB.otf" "fontMe
 
 ### Bước 3 — Đóng gói ra file game
 
-Chạy lệnh sau trong powershell:
+Chạy lệnh sau trong PowerShell:
 
 ```powershell
 uv run script/build_font_bundle.py
@@ -81,12 +80,12 @@ uv run script/build_font_bundle.py
    ```
    *(Lưu ý: không có đuôi `.txt` hay gì phía sau.)*
 2. Cắm điện thoại vào máy tính (chọn chế độ **Truyền tệp / File Transfer**), hoặc dùng trình quản lý file hỗ trợ `Android/data` (như ZArchiver + Shizuku trên Android 11+).
-   **Note:** Ở các phiên bản Android 11+, mặc định sẽ chặn truy cập `Android/data`, nên bắt buộc có quyền root hoặc ZArchiver + Shizuku. Những cái này có thể sẽ gây ảnh hưởng đến app ngân hàng
-4. Tìm đến thư mục dữ liệu của game:
+   - **Note:** Ở các phiên bản Android 11+, mặc định sẽ chặn truy cập `Android/data`, nên bắt buộc có quyền root hoặc ZArchiver + Shizuku. Những cái này có thể sẽ gây ảnh hưởng đến app ngân hàng.
+3. Tìm đến thư mục dữ liệu của game:
    - **Bản JP:** `Android/data/com.sega.pjsekai/files/data/47a2/`
    - **Bản EN:** `Android/data/com.sega.ColorfulStage.en/files/data/47a2/`
-5. **Sao lưu file gốc** `4ad9182d51b21d790af3f73d72ddc193` (nếu muốn về lại như cũ sau này), sau đó chép đè file mới vào.
-6. Mở lại game. Font mới sẽ hiển thị ngay (dễ kiểm tra nhất ở phần Rank, Level và tên người chơi).
+4. **Sao lưu file gốc** `4ad9182d51b21d790af3f73d72ddc193` (nếu muốn về lại như cũ sau này), sau đó chép đè file mới vào.
+5. Mở lại game. Font mới sẽ hiển thị ngay (dễ kiểm tra nhất ở phần Rank, Level và tên người chơi).
 
 ---
 
@@ -101,6 +100,7 @@ uv run script/build_font_bundle.py
 | `--scale 1.05` | Phóng to / thu nhỏ thêm theo tỷ lệ tùy chỉnh |
 | `--y-offset 20` | Dịch chuyển vị trí cao/thấp của chữ |
 | `--weight 700` | Chọn độ đậm (`wght`) khi dùng Variable Font |
+| `--axes "wght=700,wdth=90"` | Tùy chỉnh nhiều trục (axis) cùng lúc cho Variable Font |
 | `--font-index 0` | Chọn font con khi dùng `.ttc` / `.otc` |
 
 ### `script/build_font_bundle.py`
@@ -111,7 +111,7 @@ uv run script/build_font_bundle.py
 | `--output` / `-o` | `script/common` | Đường dẫn file bundle mã hóa xuất ra |
 | `--point-size` | `42` | Kích thước lấy mẫu SDF (font gốc là `35`) |
 | `--padding` | `5` | Độ rộng vùng biên SDF |
-| `--charset` | Bộ ký tự gốc của `common.bak` + ASCII + tiếng Việt (~2,642 ký tự) | Truyền file `.txt` khác (vd `unityMisc/characters_no_kanji.txt`) nếu muốn tự chọn bảng ký tự |
+| `--charset` | `script/characters.txt` (2,640 ký tự: bộ ký tự gốc của `common.bak` + ASCII + tiếng Việt) | Sửa trực tiếp `script/characters.txt` hoặc truyền file `.txt` khác nếu muốn tự chọn bảng ký tự |
 | `--msdf-bin` | Tự tìm / tự tải trên Windows | Trỏ thủ công tới `msdf-atlas-gen` (dùng trên macOS/Linux) |
 
 ---
