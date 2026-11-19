@@ -25,9 +25,10 @@ Mọi hành động can thiệp đến file game đều là vi phạm TOS của 
 2. **Tải bộ script này về máy**:
    - Trên trang GitHub này, bấm nút màu xanh **Code → Download ZIP**, rồi giải nén ra một thư mục (ví dụ `Desktop\Sekai-Modding`).
    - Mở thư mục vừa giải nén, bấm vào thanh địa chỉ ở trên cùng, gõ `powershell` rồi nhấn **Enter** (cửa sổ PowerShell sẽ mở sẵn đúng thư mục đó).
-   - Nếu dùng git:
-     ```git
+   - Nếu dùng CLI:
+     ```powershell
      git clone https://github.com/dang-minh-nguyet/Sekai-Modding
+     cd Sekai-Modding
      ```
 
 ---
