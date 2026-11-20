@@ -27,8 +27,15 @@ font/output/
 story/cache/
 story/work/
 story/output/
+speed change/cache/
+speed change/work/
+speed change/output/
+speed change/tools/
 temp/
 *.exe
+*.apk
+*.xapk
+*.jar
 test_builds/
 
 # General output suffixes
