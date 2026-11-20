@@ -1,8 +1,8 @@
 # Mod Font — Sekai-Modding
 
-Hướng dẫn gộp font tiếng Việt / tiếng Anh và đóng gói file font bundle (`font/common`) cho Project Sekai (hoạt động trên cả bản **JP** và **EN**, không cần Unity Editor).
+Hướng dẫn gộp font tiếng Việt / tiếng Anh và đóng gói file font bundle (`font/common`) cho Project Sekai (hoạt động trên cả bản **JP** và **EN**).
 
-> **Lưu ý:** Nếu chỉ cần mod nhanh mà không cần tùy chỉnh tham số nâng cao, bạn có thể chạy giao diện đơn giản bằng `uv run app.py` → tab **MOD FONT**.
+> **Lưu ý:** Nếu chỉ cần mod nhanh, bạn có thể chạy giao diện đơn giản bằng `uv run app.py` → tab **MOD FONT**.
 
 ---
 
@@ -65,7 +65,6 @@ uv run font/build_font_bundle.py
    ```
    *(Lưu ý: không có đuôi `.txt` hay gì phía sau. Nếu chạy qua GUI `app.py`, file đã đổi tên sẵn nằm tại `font/output/47a2/4ad9182d51b21d790af3f73d72ddc193`.)*
 2. Cắm điện thoại vào máy tính (chọn chế độ **Truyền tệp / File Transfer**), hoặc dùng trình quản lý file hỗ trợ `Android/data` (như ZArchiver + Shizuku trên Android 11+).
-   - **Lưu ý:** Ở Android 11+, mặc định sẽ chặn truy cập `Android/data`, nên cần quyền root hoặc ZArchiver + Shizuku. Những công cụ này có thể gây ảnh hưởng đến một số ứng dụng ngân hàng.
 3. Tìm đến thư mục dữ liệu của game:
    - **Bản JP:** `Android/data/com.sega.pjsekai/files/data/47a2/`
    - **Bản EN:** `Android/data/com.sega.ColorfulStage.en/files/data/47a2/`
