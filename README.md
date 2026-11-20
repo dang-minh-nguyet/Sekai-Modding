@@ -4,6 +4,7 @@ Bộ công cụ mod **Project Sekai: Colorful Stage!** (Hiện tại hỗ trợ 
 - Hỗ trợ cả bản **JP** và **EN**.
 
 > **Disclaimer:** Mọi hành động can thiệp vào file game đều vi phạm Điều khoản Dịch vụ (TOS) của Sega / Colorful Palette. Hãy cân nhắc và sao lưu file gốc trước khi sử dụng.
+> - **Lưu ý thêm:** Ở Android 11+, mặc định sẽ chặn truy cập `Android/data`, nên cần quyền root hoặc ZArchiver + Shizuku. Những công cụ này có thể gây ảnh hưởng đến một số ứng dụng ngân hàng.
 
 ---
 
