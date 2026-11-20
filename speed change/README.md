@@ -1,18 +1,17 @@
 # Mod Tốc Độ Chạy Chữ (Speed Change) — Sekai-Modding
 
-Công cụ dòng lệnh (CLI, không có GUI) giúp thay đổi **tốc độ chạy chữ hội thoại** (`TalkWindow.wordInterval`) trong Project Sekai (**JP** và **EN**).
+CLI only, giúp thay đổi **tốc độ chạy chữ hội thoại** trong Project Sekai (**JP** và **EN**).
 
-Chỉ cần chạy **1 lệnh duy nhất**, script sẽ tự động:
-1. Tải file `.xapk` bản mới nhất từ APKPure nếu máy chưa có (lưu đệm tại `speed change/cache/` để lần sau dùng lại ngay).
-2. Tự động tìm và patch toàn bộ prefab `TalkWindow` sang tốc độ bạn yêu cầu (không sửa `libil2cpp.so`).
+1. Tải file `.xapk` từ APKPure.
+2. Patch tốc độ chạy chữ.
 3. Tự động tải `uber-apk-signer`, **zipalign** và **ký số (v1 / v2 / v3)** toàn bộ split APK.
-4. Đóng gói lại thành 1 file `.xapk` hoàn chỉnh tại `speed change/output/`.
+4. Đóng gói lại thành 1 file `.xapkc hoàn chỉnh tại `speed change/output/`.
 
 ---
 
-## Mốc tốc độ tham khảo (Mặc định gốc: `60` ms)
+## Mốc tốc độ tham khảo
 
-Trong code gốc của game, tốc độ chạy chữ được cố định ở **`60` ms/ký tự** (`wordInterval = 0.06f`, tức ~16,6 ký tự/giây). **Số càng nhỏ thì chữ chạy càng nhanh:**
+Trong code gốc của game, tốc độ chạy chc được cố định ở **`60` ms/kí tự, tức ~16,6 ký tự/giây). **Số càng nhỏ thì chạy càng nhanh:**
 
 | Giá trị (ms) | Tốc độ so với gốc | Cảm nhận |
 | :--- | :--- | :--- |
