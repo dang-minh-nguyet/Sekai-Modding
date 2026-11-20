@@ -1,6 +1,6 @@
 # Mod Story — Sekai-Modding
 
-Công cụ tải, trích xuất, dịch và đóng gói lại **Main Story** và **Event Story** cho Project Sekai (bản **JP** và **EN**) thông qua `sssekai` và `UnityPy`, không cần Unity Editor.
+Công cụ tải, trích xuất, dịch và đóng gói lại **Main Story** và **Event Story** cho Project Sekai (bản **JP** và **EN**).
 
 > **Lưu ý:** Nếu bạn dịch story sang **tiếng Việt có dấu**, hãy làm theo hướng dẫn [Mod Font](../font/README.md) trước để game hiển thị được đầy đủ dấu tiếng Việt.
 
