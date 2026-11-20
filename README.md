@@ -1,27 +1,27 @@
 # Sekai-Modding
 
-Bộ công cụ mod **Project Sekai: Colorful Stage!** (font chữ tiếng Việt/tiếng Anh, dịch story,...) chạy trực tiếp bằng Python + `uv`, không cần Unity Editor.
+Bộ công cụ mod **Project Sekai: Colorful Stage!** (Hiện tại hỗ trợ mod font và dịch story).
 - Hỗ trợ cả bản **JP** và **EN**.
 
 > **Disclaimer:** Mọi hành động can thiệp vào file game đều vi phạm Điều khoản Dịch vụ (TOS) của Sega / Colorful Palette. Hãy cân nhắc và sao lưu file gốc trước khi sử dụng.
 
 ---
 
-## Chọn cách sử dụng
+## Cách dùng
 
-- **Người dùng phổ thông (GUI):** Chạy `uv run app.py` để mở giao diện đơn giản (gồm sẵn hướng dẫn cho cả Mod Story và Mod Font).
-- **Người có kiến thức kỹ thuật / cần tùy chỉnh sâu (CLI):** Nên dùng trực tiếp **CLI** thay vì GUI để toàn quyền chỉnh các tham số nâng cao (`--match-cap-height`, `--scale`, `--y-offset`, `--weight`, `--charset`, batch patch, giải mã/mã hóa bundle riêng,...).
+- **GUI:** Chạy `uv run app.py` để mở giao diện (gồm hướng dẫn cho cả Mod Story và Mod Font).
+- **CLI:** Nên dùng trực tiếp **CLI** nếu muốn chỉnh các tham số nâng cao (`--match-cap-height`, `--scale`, `--y-offset`, `--weight`, `--charset`, batch patch, giải mã/mã hóa bundle riêng,...).
 
 | Module | Mô tả | Hướng dẫn chi tiết (CLI) |
 | :--- | :--- | :--- |
-| **Giao diện đơn giản** (`app.py`) | UI tối giản cho người dùng bình thường (Mod Story & Mod Font) | Chạy `uv run app.py` |
-| **Mod Font** (`font/`) | Gộp font tiếng Việt / tiếng Anh và đóng gói bundle font SDF (`font/common`) | [font/README.md](font/README.md) |
-| **Mod Story** (`story/`) | Tải bundle Main Story / Event Story qua `sssekai`, xuất `.txt` dịch, patch và mã hóa | [story/README.md](story/README.md) |
+| **Giao diện** (`app.py`) | UI tối giản cho người dùng bình thường (Mod Story & Mod Font) | Chạy `uv run app.py` |
+| **Mod Font** (`font/`) | Gộp font tiếng Việt / tiếng Anh và đóng gói bundle (`font/common`) | [font/README.md](font/README.md) |
+| **Mod Story** (`story/`) | Tải bundle Main Story / Event Story, xuất `.txt` dịch, patch và mã hóa | [story/README.md](story/README.md) |
 | **Bundle Crypto** (`script/`) | Giải mã / mã hóa riêng lẻ một file bundle bất kỳ (`decrypt_bundle.py`, `encrypt_bundle.py`) | Kéo thả file vào script hoặc truyền đường dẫn qua CLI |
 
 ---
 
-## Cài đặt ban đầu (chỉ cần làm 1 lần)
+## Cài đặt
 
 1. **Cài `uv`:**
    - Mở **Windows PowerShell**, dán lệnh sau rồi nhấn **Enter**:
