@@ -6,15 +6,15 @@ merged .otf/.ttf fonts (DB + EB) WITHOUT Unity Editor, using `msdf-atlas-gen`
 and `UnityPy` (Unity 2022.3.62f2).
 
 What it does:
-  1. Decrypts `script/common.bak`
+  1. Decrypts `font/assets/common.bak`
   2. Generates 4096x2048 Alpha8 SDF atlases & glyph metrics via `msdf-atlas-gen`
      (auto-downloads official Windows binary on first run if not found)
   3. Patches both `TMP_FontAsset` MonoBehaviours, both `Texture2D` atlases,
      and all 3 `Material`s (DB, EB, EB-Gacha) inside the bundle
-  4. Packs with LZ4, re-encrypts the 128-byte header, and writes `script/common`
+  4. Packs with LZ4, re-encrypts the 128-byte header, and writes `font/output/common`
 
 Usage (with uv):
-  uv run script/build_font_bundle.py
+  uv run font/build_font_bundle.py
 """
 
 import argparse
@@ -400,7 +400,7 @@ def build_bundle(
     if len(font_objs) != 2:
         raise RuntimeError(f"Expected DB & EB TMP_FontAssets in bundle, found: {list(font_objs.keys())}")
 
-    default_charset = os.path.join(os.path.dirname(os.path.abspath(__file__)), "characters.txt")
+    default_charset = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "characters.txt")
     resolved_charset = charset_path or (default_charset if os.path.isfile(default_charset) else None)
 
     if resolved_charset:
@@ -505,35 +505,36 @@ def build_bundle(
 
 def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    repo_root = os.path.dirname(script_dir)
+    assets_dir = os.path.join(script_dir, "assets")
+    output_dir = os.path.join(script_dir, "output")
 
     parser = argparse.ArgumentParser(
         description="Build encrypted Project Sekai font bundle directly without Unity Editor (msdf-atlas-gen + UnityPy)."
     )
     parser.add_argument(
         "--db",
-        default=os.path.join(repo_root, "fontMerging", "FOT-RodinNTLGPro-DB-OnDemand.otf"),
-        help="Path to merged DB font (default: fontMerging/FOT-RodinNTLGPro-DB-OnDemand.otf)",
+        default=os.path.join(output_dir, "FOT-RodinNTLGPro-DB-OnDemand.otf"),
+        help="Path to merged DB font (default: font/output/FOT-RodinNTLGPro-DB-OnDemand.otf)",
     )
     parser.add_argument(
         "--eb",
-        default=os.path.join(repo_root, "fontMerging", "FOT-RodinNTLGPro-EB-OnDemand.otf"),
-        help="Path to merged EB font (default: fontMerging/FOT-RodinNTLGPro-EB-OnDemand.otf)",
+        default=os.path.join(output_dir, "FOT-RodinNTLGPro-EB-OnDemand.otf"),
+        help="Path to merged EB font (default: font/output/FOT-RodinNTLGPro-EB-OnDemand.otf)",
     )
     parser.add_argument(
         "--original",
-        default=os.path.join(script_dir, "common.bak"),
-        help="Path to original encrypted common.bak bundle (default: script/common.bak)",
+        default=os.path.join(assets_dir, "common.bak"),
+        help="Path to original encrypted common.bak bundle (default: font/assets/common.bak)",
     )
     parser.add_argument(
         "--output", "-o",
-        default=os.path.join(script_dir, "common"),
-        help="Output encrypted bundle path (default: script/common)",
+        default=os.path.join(output_dir, "common"),
+        help="Output encrypted bundle path (default: font/output/common)",
     )
     parser.add_argument(
         "--charset",
         default=None,
-        help="Optional UTF-8 text file of characters (default: script/characters.txt if present, else common.bak + ASCII & Vietnamese)",
+        help="Optional UTF-8 text file of characters (default: font/assets/characters.txt if present, else common.bak + ASCII & Vietnamese)",
     )
     parser.add_argument("--msdf-bin", default=None, help="Optional path to msdf-atlas-gen executable")
     parser.add_argument("--point-size", type=int, default=42, help="Sampling point size (default: 42)")
