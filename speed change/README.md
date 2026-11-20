@@ -5,13 +5,13 @@ CLI only, giúp thay đổi **tốc độ chạy chữ hội thoại** trong Pro
 1. Tải file `.xapk` từ APKPure.
 2. Patch tốc độ chạy chữ.
 3. Tự động tải `uber-apk-signer`, **zipalign** và **ký số (v1 / v2 / v3)** toàn bộ split APK.
-4. Đóng gói lại thành 1 file `.xapkc hoàn chỉnh tại `speed change/output/`.
+4. Đóng gói lại thành 1 file `.xapk` hoàn chỉnh tại `speed change/output/`.
 
 ---
 
 ## Mốc tốc độ tham khảo
 
-Trong code gốc của game, tốc độ chạy chc được cố định ở **`60` ms/kí tự, tức ~16,6 ký tự/giây). **Số càng nhỏ thì chạy càng nhanh:**
+Trong code gốc của game, tốc độ chạy chc được cố định ở **60** ms/kí tự, tức ~16,6 ký tự/giây). **Số càng nhỏ thì chạy càng nhanh:**
 
 | Giá trị (ms) | Tốc độ so với gốc | Cảm nhận |
 | :--- | :--- | :--- |
