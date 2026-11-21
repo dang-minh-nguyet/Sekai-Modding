@@ -5,13 +5,13 @@ CLI only, giúp thay đổi **tốc độ chạy chữ hội thoại** trong Pro
 1. Tải file `.xapk` từ APKPure.
 2. Patch tốc độ chạy chữ.
 3. Tự động tải `uber-apk-signer`, **zipalign** và **ký số (v1 / v2 / v3)** toàn bộ split APK.
-4. Đóng gói lại thành 1 file `.xapk` hoàn chỉnh tại `speed change/output/`.
+4. Đóng gói lại thành 1 file `.xapk` hoàn chỉnh tại `speed_change/output/`.
 
 ---
 
 ## Mốc tốc độ tham khảo
 
-Trong code gốc của game, tốc độ chạy chc được cố định ở **60** ms/kí tự, tức ~16,6 ký tự/giây). **Số càng nhỏ thì chạy càng nhanh:**
+Trong code gốc của game, tốc độ chạy chữ được cố định ở **60** ms/ký tự (~16,6 ký tự/giây). **Số càng nhỏ thì chạy càng nhanh:**
 
 | Giá trị (ms) | Tốc độ so với gốc | Cảm nhận |
 | :--- | :--- | :--- |
@@ -41,38 +41,38 @@ Mở PowerShell tại thư mục gốc `Sekai-Modding` và chạy:
 
 ```powershell
 # Đổi tốc độ chạy chữ bản JP thành 35ms/ký tự (gốc là 60ms)
-uv run "speed change/speed_change.py" 35
+uv run speed_change/speed_change.py 35
 ```
 
 ### Các tùy chọn bổ sung
 
 ```powershell
 # Đổi tốc độ bản EN thành 30ms/ký tự
-uv run "speed change/speed_change.py" 30 --region en
+uv run speed_change/speed_change.py 30 --region en
 
 # Buộc tải lại XAPK bản mới nhất (dùng khi game vừa cập nhật phiên bản)
-uv run "speed change/speed_change.py" 35 --refresh
+uv run speed_change/speed_change.py 35 --refresh
 
 # Dùng file .xapk bạn đã tải sẵn trên máy
-uv run "speed change/speed_change.py" 35 --input "D:\Downloads\com.sega.pjsekai.xapk"
+uv run speed_change/speed_change.py 35 --input "D:\Downloads\com.sega.pjsekai.xapk"
 
 # Tùy chọn: chỉnh luôn thời gian nghỉ sang câu mới ở chế độ Auto (giây, mặc định gốc: 2.0)
-uv run "speed change/speed_change.py" 35 --auto-delay 1.0
+uv run speed_change/speed_change.py 35 --auto-delay 1.0
 
 # Chỉ định đường dẫn file xuất ra
-uv run "speed change/speed_change.py" 35 --output "D:\sekai_35ms.xapk"
+uv run speed_change/speed_change.py 35 --output "D:\sekai_35ms.xapk"
 ```
 
 File kết quả mặc định nằm tại:
 ```text
-speed change/output/com.sega.pjsekai_<số>ms_signed.xapk
+speed_change/output/com.sega.pjsekai_<số>ms_signed.xapk
 ```
 
 ---
 
 ## Cách cài đặt lên Android
 
-1. Chép file `.xapk` trong `speed change/output/` sang điện thoại.
+1. Chép file `.xapk` trong `speed_change/output/` sang điện thoại.
 2. Cài đặt bằng **SAI (Split APKs Installer)** hoặc **XAPK Installer**:
    - Mở SAI → **Install APKs** → **Internal file picker** → chọn file `.xapk` vừa tạo.
 3. **Lưu ý quan trọng về chữ ký ứng dụng:**
@@ -88,4 +88,4 @@ speed change/output/com.sega.pjsekai_<số>ms_signed.xapk
 
 - Trường `TalkData.Speed` trong các file kịch bản story (`event_xxx.asset`) là trường không được client sử dụng.
 - Tốc độ thực tế do component `TalkWindow` (Unity `MonoBehaviour`, kích thước serialize 204 byte) quản lý qua trường `[SerializeField] float wordInterval` tại offset `0x84` (mặc định `0.06f` = 60ms) và `autoTextNextPageDelay` tại offset `0xC8` (mặc định `2.0f`).
-- Script tự động quét mọi split APK trong XAPK để tìm chính xác các prefab chứa `TalkWindow` (nên hoạt động được cho cả JP, EN và các bản cập nhật sau), patch giá trị float mới, cập nhật CRC-32 rồi ký lại đồng bộ toàn bộ gói APK.
+- Script tự động tìm chính xác `MonoScript` của `Sekai.TalkWindow` trong `globalgamemanagers.assets`, sau đó quét toàn bộ split APK trong XAPK để vá **tất cả** prefab chứa `TalkWindow` (cả 3 prefab Story/Cutscene/Cheerful Carnival lẫn 3 prefab `UIPartsLive2DTalkWindow` / `UIPartsLive2DAndTalkWindowViewer` / `CharacterArchiveLive2DVoicePlayer` — hoạt động cho JP, EN và các bản cập nhật sau), patch giá trị float mới, cập nhật CRC-32 rồi ký lại đồng bộ toàn bộ gói APK.

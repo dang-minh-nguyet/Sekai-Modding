@@ -10,8 +10,9 @@ Hướng dẫn gộp font tiếng Việt / tiếng Anh và đóng gói file font
 
 - `font/assets/` — File gốc của game (`FOT-RodinNTLG Pro DB/EB.otf`, `common.bak`, `characters.txt`)
 - `font/merge_fonts.py` — Script gộp glyph Latin/tiếng Việt vào font gốc
-- `font/build_font_bundle.py` — Script tạo SDF atlas và đóng gói + mã hóa bundle
-- `font/output/` — Chứa file font đã gộp và file bundle kết quả (tự tạo khi chạy)
+- `font/build_font_bundle.py` — *(Cách 1 — Bundle cũ)* Tạo SDF atlas và đóng gói + mã hóa bundle `font/common` chép vào `Android/data`
+- `font/patch_xapk_font.py` — *(Cách 2 — XAPK trực tiếp)* Patch font thẳng vào file `.xapk` và ký số sẵn (không cần `Android/data` / Shizuku / Root)
+- `font/output/` — Chứa file font đã gộp và file bundle / `.xapk` kết quả (tự tạo khi chạy)
 - `font/tools/` — Chứa `msdf-atlas-gen.exe` (tự tải lần đầu trên Windows)
 
 ---
@@ -43,7 +44,9 @@ uv run font/merge_fonts.py "font/assets/FOT-RodinNTLG Pro EB.otf" "MyFont-Bold.t
 
 ---
 
-## Bước 3 — Đóng gói ra file game
+## Bước 3 — Chọn 1 trong 2 cách đóng gói
+
+### Cách 1 (Truyền thống — chép vào `Android/data`, giữ nguyên bản game gốc)
 
 Chạy lệnh sau trong PowerShell:
 
@@ -55,9 +58,7 @@ uv run font/build_font_bundle.py
 - Quá trình tạo font SDF và mã hóa mất khoảng **15–20 giây**.
 - Kết quả là file đã mã hóa nằm tại **`font/output/common`**.
 
----
-
-## Bước 4 — Chép vào điện thoại Android
+#### Cài đặt Cách 1 lên Android
 
 1. Đổi tên file `font/output/common` thành:
    ```text
@@ -70,6 +71,32 @@ uv run font/build_font_bundle.py
    - **Bản EN:** `Android/data/com.sega.ColorfulStage.en/files/data/47a2/`
 4. **Sao lưu file gốc** `4ad9182d51b21d790af3f73d72ddc193` (nếu muốn khôi phục sau này), sau đó chép đè file mới vào.
 5. Mở lại game. Font mới sẽ hiển thị ngay (dễ kiểm tra nhất ở phần Rank, Level và tên người chơi).
+
+---
+
+### Cách 2 (Mới — Patch thẳng vào file `.xapk`, KHÔNG cần `Android/data` / Shizuku / Root)
+
+Yêu cầu thêm **Java (JRE/JDK 8+)** để ký số APK bằng `uber-apk-signer` (giống [speed_change/README.md](../speed_change/README.md)).
+
+```powershell
+# Patch font trực tiếp vào XAPK bản JP (dùng chung cache XAPK với speed_change/)
+uv run font/patch_xapk_font.py
+
+# Bản EN
+uv run font/patch_xapk_font.py --region en
+
+# Kết hợp Mod Font + Đổi tốc độ chạy chữ (35ms) vào chung 1 file XAPK duy nhất!
+uv run font/patch_xapk_font.py --speed-ms 35
+
+# Dùng file .xapk đã tải sẵn trên máy
+uv run font/patch_xapk_font.py --input "D:\Downloads\com.sega.pjsekai.xapk"
+```
+
+- Script tự động patch đủ 3 tầng font trong `UnityDataAssetPack.apk`:
+  1. Hai file OTF nhúng `font/fot-rodinntlgpro-db` & `eb` (cho `SDF_Dynamic`).
+  2. Hai atlas khởi động/Title `font/fot-rodinntlgpro-db-builtin` & `eb-builtin` (`1024×1024`).
+  3. Hai atlas chính `font/fot-rodinntlgpro-db sdf_base` & `eb sdf_base` (`1024×1024`, đầy đủ ASCII + 134 ký tự tiếng Việt) cùng toàn bộ ~36 preset Material (`sdf_base_scenario`, `sdf_base_outline_*`, `sdf_base gacha`, độ khó bài hát...) — chữ Nhật vẫn fallback mượt về `font/common` & `SDF_Dynamic`.
+- File kết quả nằm tại `font/output/<package>_font_signed.xapk` → cài bằng **SAI (Split APKs Installer)** hoặc **XAPK Installer** (cùng debug keystore với `speed_change.py`, cài đè qua lại thoải mái).
 
 ---
 
@@ -98,3 +125,17 @@ uv run font/build_font_bundle.py
 | `--padding` | `5` | Độ rộng vùng biên SDF |
 | `--charset` | `font/assets/characters.txt` (2,640 ký tự: bộ ký tự gốc của `common.bak` + ASCII + tiếng Việt) | Sửa trực tiếp `font/assets/characters.txt` hoặc truyền file `.txt` khác nếu muốn tự chọn bảng ký tự |
 | `--msdf-bin` | Tự tìm / tự tải trên Windows | Trỏ thủ công tới `msdf-atlas-gen` (dùng trên macOS/Linux) |
+
+### `font/patch_xapk_font.py`
+
+| Tham số | Mặc định | Công dụng |
+| :--- | :--- | :--- |
+| `--db` / `--eb` | `font/output/FOT-RodinNTLGPro-*-OnDemand.otf` | Đường dẫn 2 file font đã gộp |
+| `--region` | `jp` | Server game (`jp` hoặc `en`) |
+| `--input` | Tự tải & dùng chung cache với `speed_change/cache/` | Đường dẫn file `.xapk` có sẵn trên máy |
+| `--output` / `-o` | `font/output/<pkg>_font_signed.xapk` | Đường dẫn file `.xapk` xuất ra |
+| `--refresh` | Tắt | Buộc tải lại XAPK mới nhất từ APKPure |
+| `--speed-ms` | Không bật | Tùy chọn gộp chung mod tốc độ chạy chữ (ms/ký tự, VD: `35`) |
+| `--auto-delay` | Không bật | Tùy chọn đổi thêm thời gian chờ Auto (giây, đi kèm `--speed-ms`) |
+| `--no-sdf-base` | Tắt | Chỉ patch OTF nhúng + Builtin atlas (bỏ qua `SDF_Base`) |
+| `--point-size` / `--builtin-point-size` | `42` / `36` | Kích thước lấy mẫu SDF cho `SDF_Base` và `Builtin` (`1024×1024`) |

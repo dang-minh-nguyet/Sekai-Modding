@@ -23,14 +23,15 @@ font/common
 font/font_replacement
 font/4ad9182d51b21d790af3f73d72ddc193
 font/tools/
+font/work/
 font/output/
 story/cache/
 story/work/
 story/output/
-speed change/cache/
-speed change/work/
-speed change/output/
-speed change/tools/
+speed_change/cache/
+speed_change/work/
+speed_change/output/
+speed_change/tools/
 temp/
 *.exe
 *.apk
@@ -41,6 +42,11 @@ test_builds/
 # General output suffixes
 *.modded
 *.encrypted
+
+# Notes & Ideas
+MODDING_IDEAS.md
+*modding_idea*
+*modding_ideas*
 
 # OS
 Thumbs.db

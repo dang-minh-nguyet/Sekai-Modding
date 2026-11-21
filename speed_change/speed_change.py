@@ -164,16 +164,69 @@ def download_xapk(region: str, force_refresh: bool = False) -> Path:
     return xapk_path
 
 
-def find_talk_window_patches(asset_bytes: bytes) -> List[Tuple[int, float, float]]:
-    """Inspect a Unity asset file and locate all TalkWindow MonoBehaviour speed offsets.
+def find_talk_window_script_pid(extract_dir: Path) -> Optional[int]:
+    """Locate the exact MonoScript PathID of Sekai.TalkWindow in globalgamemanagers.assets."""
+    for apk_file in sorted(extract_dir.glob("*.apk")):
+        with zipfile.ZipFile(apk_file, "r") as zf:
+            names = zf.namelist()
+            raw: Optional[bytes] = None
+            if "assets/bin/Data/globalgamemanagers.assets" in names:
+                raw = zf.read("assets/bin/Data/globalgamemanagers.assets")
+            else:
+                splits = sorted(
+                    (n for n in names if n.startswith("assets/bin/Data/globalgamemanagers.assets.split")),
+                    key=lambda s: int(s.rsplit("split", 1)[1]),
+                )
+                if splits:
+                    raw = b"".join(zf.read(s) for s in splits)
+            if not raw:
+                continue
+            env = UnityPy.load(raw)
+            for obj in env.objects:
+                if obj.type.name == "MonoScript":
+                    try:
+                        d = obj.read()
+                        if getattr(d, "m_ClassName", "") == "TalkWindow" and getattr(d, "m_Namespace", "") == "Sekai":
+                            return obj.path_id
+                    except Exception:
+                        pass
+    return None
 
-    Returns list of (absolute_wordInterval_offset, current_wordInterval, current_autoDelay).
+
+def find_talk_window_patches(
+    asset_bytes: bytes,
+    talk_window_script_pid: Optional[int] = None,
+) -> List[Tuple[int, float, float, str]]:
+    """Inspect a Unity asset file and locate all Sekai.TalkWindow MonoBehaviour speed offsets.
+
+    Matches both scenario TalkWindow prefabs and Live2D TalkWindow prefabs
+    (e.g. UIPartsLive2DTalkWindow, UIPartsLive2DAndTalkWindowViewer,
+    ScreenLayerCharacterArchiveLive2DVoicePlayer).
+
+    Returns list of (absolute_wordInterval_offset, current_wordInterval, current_autoDelay, go_name).
     """
     # Fast pre-filter before invoking UnityPy
-    if b"TalkWindow" not in asset_bytes or b"WordsOutline" not in asset_bytes:
+    if talk_window_script_pid is not None:
+        if struct.pack("<q", talk_window_script_pid) not in asset_bytes:
+            return []
+    else:
+        if b"TalkWindow" not in asset_bytes:
+            return []
+
+    try:
+        env = UnityPy.load(asset_bytes)
+    except Exception:
         return []
 
-    env = UnityPy.load(asset_bytes)
+    ggma_fids: set[int] = set()
+    if talk_window_script_pid is not None:
+        for sf in env.files.values():
+            for idx, ext in enumerate(getattr(sf, "externals", []), start=1):
+                if getattr(ext, "path", "").lower() == "globalgamemanagers.assets":
+                    ggma_fids.add(idx)
+        if not ggma_fids:
+            return []
+
     go_names: Dict[int, str] = {}
     for obj in env.objects:
         if obj.type.name == "GameObject":
@@ -182,7 +235,7 @@ def find_talk_window_patches(asset_bytes: bytes) -> List[Tuple[int, float, float
             except Exception:
                 pass
 
-    results: List[Tuple[int, float, float]] = []
+    results: List[Tuple[int, float, float, str]] = []
     for obj in env.objects:
         if obj.type.name != "MonoBehaviour":
             continue
@@ -190,13 +243,21 @@ def find_talk_window_patches(asset_bytes: bytes) -> List[Tuple[int, float, float
         if len(raw) != TALK_WINDOW_MONO_SIZE:
             continue
         _go_fid, go_pid = struct.unpack_from("<Iq", raw, 0)
-        if go_names.get(go_pid) != "TalkWindow":
-            continue
+        script_fid, script_pid = struct.unpack_from("<Iq", raw, 16)
+        go_name = go_names.get(go_pid, "")
+
+        if talk_window_script_pid is not None:
+            if script_fid not in ggma_fids or script_pid != talk_window_script_pid:
+                continue
+        else:
+            if "TalkWindow" not in go_name:
+                continue
+
         word_interval = struct.unpack_from("<f", raw, OFFSET_WORD_INTERVAL)[0]
         auto_delay = struct.unpack_from("<f", raw, OFFSET_AUTO_NEXT_DELAY)[0]
         # Sanity-check float ranges
         if 0.0 <= word_interval <= 2.0 and 0.0 <= auto_delay <= 60.0:
-            results.append((obj.byte_start + OFFSET_WORD_INTERVAL, word_interval, auto_delay))
+            results.append((obj.byte_start + OFFSET_WORD_INTERVAL, word_interval, auto_delay, go_name or "TalkWindow"))
     return results
 
 
@@ -288,6 +349,7 @@ def patch_single_apk(
     apk_path: Path,
     speed_sec: float,
     auto_delay_sec: Optional[float] = None,
+    talk_window_script_pid: Optional[int] = None,
 ) -> int:
     """Scan an APK for TalkWindow assets and patch wordInterval (and optional autoDelay).
 
@@ -300,12 +362,12 @@ def patch_single_apk(
         candidates = [n for n in zf.namelist() if n.startswith("assets/bin/Data/")]
         for entry_name in candidates:
             raw = zf.read(entry_name)
-            hits = find_talk_window_patches(raw)
+            hits = find_talk_window_patches(raw, talk_window_script_pid=talk_window_script_pid)
             if not hits:
                 continue
 
             buf = bytearray(raw)
-            for abs_wi_off, old_wi, old_delay in hits:
+            for abs_wi_off, old_wi, old_delay, go_name in hits:
                 buf[abs_wi_off : abs_wi_off + 4] = struct.pack("<f", speed_sec)
                 delay_note = ""
                 if auto_delay_sec is not None:
@@ -313,7 +375,7 @@ def patch_single_apk(
                     buf[abs_delay_off : abs_delay_off + 4] = struct.pack("<f", auto_delay_sec)
                     delay_note = f", autoDelay: {old_delay:.2f}s -> {auto_delay_sec:.2f}s"
                 print(
-                    f"      Patch {apk_path.name} :: {Path(entry_name).name} "
+                    f"      Patch {apk_path.name} :: {Path(entry_name).name} ({go_name}) "
                     f"@ {hex(abs_wi_off)}: {old_wi*1000:.1f}ms -> {speed_sec*1000:.1f}ms{delay_note}"
                 )
                 patched_count += 1
@@ -414,9 +476,9 @@ def parse_args() -> argparse.Namespace:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=(
             "Ví dụ:\n"
-            '  uv run "speed change/speed_change.py" 35              # JP, 35ms/ký tự\n'
-            '  uv run "speed change/speed_change.py" 30 --region en  # EN, 30ms/ký tự\n'
-            '  uv run "speed change/speed_change.py" 40 --refresh    # Tải lại XAPK mới nhất\n'
+            "  uv run speed_change/speed_change.py 35              # JP, 35ms/ký tự\n"
+            "  uv run speed_change/speed_change.py 30 --region en  # EN, 30ms/ký tự\n"
+            "  uv run speed_change/speed_change.py 40 --refresh    # Tải lại XAPK mới nhất\n"
         ),
     )
     parser.add_argument(
@@ -440,7 +502,7 @@ def parse_args() -> argparse.Namespace:
         "--output",
         type=Path,
         default=None,
-        help="Đường dẫn file .xapk đầu ra (mặc định: speed change/output/<pkg>_<ms>ms_signed.xapk).",
+        help="Đường dẫn file .xapk đầu ra (mặc định: speed_change/output/<pkg>_<ms>ms_signed.xapk).",
     )
     parser.add_argument(
         "--refresh",
@@ -456,7 +518,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--keep-work",
         action="store_true",
-        help="Giữ lại thư mục tạm speed change/work/ sau khi đóng gói.",
+        help="Giữ lại thư mục tạm speed_change/work/ sau khi đóng gói.",
     )
     parser.add_argument("--keystore", default=None, help="Đường dẫn keystore riêng (tùy chọn).")
     parser.add_argument("--ks-alias", default=None, help="Alias của keystore riêng.")
@@ -516,10 +578,16 @@ def main() -> None:
         with zipfile.ZipFile(xapk_src, "r") as zf:
             zf.extractall(extract_dir)
 
+        tw_script_pid = find_talk_window_script_pid(extract_dir)
         speed_sec = args.speed_ms / 1000.0
         total_patched = 0
         for apk_file in sorted(extract_dir.glob("*.apk")):
-            total_patched += patch_single_apk(apk_file, speed_sec, args.auto_delay)
+            total_patched += patch_single_apk(
+                apk_file,
+                speed_sec,
+                args.auto_delay,
+                talk_window_script_pid=tw_script_pid,
+            )
 
         if total_patched == 0:
             raise RuntimeError(

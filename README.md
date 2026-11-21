@@ -1,6 +1,6 @@
 # Sekai-Modding
 
-Bộ công cụ mod **Project Sekai: Colorful Stage!** (Hiện tại hỗ trợ mod font và dịch story).
+Bộ công cụ mod **Project Sekai: Colorful Stage!** (Hỗ trợ mod font qua `Android/data` hoặc patch thẳng XAPK, dịch story và đổi tốc độ chạy chữ).
 - Hỗ trợ cả bản **JP** và **EN**.
 
 > **Disclaimer:** Mọi hành động can thiệp vào file game đều vi phạm Điều khoản Dịch vụ (TOS) của Sega / Colorful Palette. Hãy cân nhắc và sao lưu file gốc trước khi sử dụng.
@@ -14,9 +14,9 @@ Bộ công cụ mod **Project Sekai: Colorful Stage!** (Hiện tại hỗ trợ 
 | Module | Mô tả | Hướng dẫn chi tiết (CLI) |
 | :--- | :--- | :--- |
 | **Giao diện** (`app.py`) | UI tối giản cho người dùng bình thường (Mod Story & Mod Font) | Chạy `uv run app.py` |
-| **Mod Font** (`font/`) | Gộp font tiếng Việt / tiếng Anh và đóng gói bundle (`font/common`) | [font/README.md](font/README.md) |
+| **Mod Font** (`font/`) | Gộp font tiếng Việt / Latin và đóng gói bundle (`font/common`) **hoặc patch trực tiếp vào XAPK** (`patch_xapk_font.py`) | [font/README.md](font/README.md) |
 | **Mod Story** (`story/`) | Tải bundle Main Story / Event Story, xuất `.txt` dịch, patch và mã hóa | [story/README.md](story/README.md) |
-| **Mod Tốc Độ Chữ** (`speed change/`) | Đổi tốc độ chạy chữ hội thoại (mặc định gốc `60ms`), tự tải XAPK, patch và ký lại (CLI) | [speed change/README.md](speed%20change/README.md) |
+| **Mod Tốc Độ Chữ** (`speed_change/`) | Đổi tốc độ chạy chữ hội thoại (mặc định gốc `60ms`), tự tải XAPK, patch đủ 6/6 prefab `TalkWindow` và ký lại (CLI) | [speed_change/README.md](speed_change/README.md) |
 | **Bundle Crypto** (`script/`) | Giải mã / mã hóa riêng lẻ một file bundle bất kỳ (`decrypt_bundle.py`, `encrypt_bundle.py`) | Kéo thả file vào script hoặc truyền đường dẫn qua CLI |
 
 ---
@@ -42,4 +42,4 @@ Bộ công cụ mod **Project Sekai: Colorful Stage!** (Hiện tại hỗ trợ 
 
 3. **Bắt đầu:**
    - Mở giao diện đơn giản: `uv run app.py`
-   - Hoặc xem hướng dẫn CLI chi tiết tại [font/README.md](font/README.md), [story/README.md](story/README.md) và [speed change/README.md](speed%20change/README.md).
+   - Hoặc xem hướng dẫn CLI chi tiết tại [font/README.md](font/README.md), [story/README.md](story/README.md) và [speed_change/README.md](speed_change/README.md).
