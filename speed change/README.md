@@ -15,10 +15,10 @@ Trong code gốc của game, tốc độ chạy chc được cố định ở **
 
 | Giá trị (ms) | Tốc độ so với gốc | Cảm nhận |
 | :--- | :--- | :--- |
-| **`60`** | **1.0x (Mặc định gốc)** | Tốc độ gốc của game |
-| **`45`** | ~1.33x | Nhanh hơn nhẹ, vẫn giữ nhịp tự nhiên |
-| **`35`** | ~1.71x | Nhanh vừa phải, dễ đọc tiếng Việt *(gợi ý)* |
-| **`30`** | 2.0x | Nhanh gấp đôi gốc *(gợi ý)* |
+| **`60`** | **1.0x** | Tốc độ gốc của game |
+| **`45`** | ~1.33x | Nhanh hơn một chút |
+| **`35`** | ~1.71x | Nhanh vừa phải, dễ đọc tiếng Việt |
+| **`30`** | 2.0x | Nhanh gấp đôi |
 | **`20`** | 3.0x | Rất nhanh |
 
 ---
@@ -76,16 +76,16 @@ speed change/output/com.sega.pjsekai_<số>ms_signed.xapk
 2. Cài đặt bằng **SAI (Split APKs Installer)** hoặc **XAPK Installer**:
    - Mở SAI → **Install APKs** → **Internal file picker** → chọn file `.xapk` vừa tạo.
 3. **Lưu ý quan trọng về chữ ký ứng dụng:**
-   - **Lần đầu tiên** chuyển từ bản gốc (CH Play / QooApp) sang bản tự ký:
+   - **Lần đầu tiên** chuyển từ bản gốc (CH Play / QooApp) sang bản mod:
      - **Máy chưa Root:** Bắt buộc **gỡ bản game gốc trước** rồi mới cài bản `.xapk` này (hãy chắc chắn đã **liên kết tài khoản / lưu Transfer ID** trước khi gỡ!).
-     - **Máy đã Root (có LSPosed + Core Patch):** Có thể cài đè trực tiếp không cần gỡ.
+     - **Máy đã Root (có LSPosed + Core Patch):** Có thể cài trực tiếp.
    - **Từ lần thứ 2 trở đi** (ví dụ bạn muốn đổi từ `20ms` sang `35ms`, `40ms` hoặc khi game update và bạn chạy lại `--refresh` trên cùng máy tính):
-     - `uber-apk-signer` dùng cùng một khóa debug cố định của máy (`~/.android/debug.keystore`), nên bạn chỉ cần **cài đè (Update) trực tiếp**, không cần gỡ game và không mất dữ liệu!
+     - `uber-apk-signer` dùng cùng một khóa debug cố định của máy (`~/.android/debug.keystore`), nên bạn chỉ cần **cài trực tiếp**, không cần gỡ game và không mất dữ liệu!
 
 ---
 
 ## Cơ chế kỹ thuật (Dành cho người muốn tìm hiểu)
 
 - Trường `TalkData.Speed` trong các file kịch bản story (`event_xxx.asset`) là trường không được client sử dụng.
-- Tốc độ hiển thị thực tế do component `TalkWindow` (Unity `MonoBehaviour`, kích thước serialize 204 byte) quản lý qua trường `[SerializeField] float wordInterval` tại offset `0x84` (mặc định `0.06f` = 60ms) và `autoTextNextPageDelay` tại offset `0xC8` (mặc định `2.0f`).
+- Tốc độ thực tế do component `TalkWindow` (Unity `MonoBehaviour`, kích thước serialize 204 byte) quản lý qua trường `[SerializeField] float wordInterval` tại offset `0x84` (mặc định `0.06f` = 60ms) và `autoTextNextPageDelay` tại offset `0xC8` (mặc định `2.0f`).
 - Script tự động quét mọi split APK trong XAPK để tìm chính xác các prefab chứa `TalkWindow` (nên hoạt động được cho cả JP, EN và các bản cập nhật sau), patch giá trị float mới, cập nhật CRC-32 rồi ký lại đồng bộ toàn bộ gói APK.
